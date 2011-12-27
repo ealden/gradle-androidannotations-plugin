@@ -87,7 +87,7 @@ class AndroidAnnotationsPlugin implements Plugin<Project> {
                 ])
             annotationProcessing.appendNode(
                 'processModule', [
-                    name: 'HelloWorld',
+                    name: project.name,
                     generatedDirName: 'gen'
                 ])
         }
