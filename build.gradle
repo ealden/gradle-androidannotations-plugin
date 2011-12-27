@@ -8,6 +8,7 @@ project.artifact = artifact
 
 apply plugin: 'groovy'
 apply plugin: 'idea'
+apply plugin: 'maven'
 
 def compatibilityVersion = 1.6
 sourceCompatibility = compatibilityVersion
@@ -58,6 +59,15 @@ idea {
     project {
         jdkName = '1.6'
         languageLevel = compatibilityVersion
+    }
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository url: 'file:///maven/external'
+            pom.artifactId = artifact
+        }
     }
 }
 
