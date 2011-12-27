@@ -23,15 +23,19 @@ import org.gradle.api.file.FileCollection
 
 class AndroidAnnotationsPlugin implements Plugin<Project> {
     private project
+    private androidAnnotationsConvention
 
     void apply(Project project) {
         this.project = project
 
         project.plugins.apply(AndroidPlugin.class)
 
-        configureJavaPlugin()
+        this.androidAnnotationsConvention = new AndroidAnnotationsConvention()
+        project.convention.plugins.androidannotations = this.androidAnnotationsConvention
 
         project.gradle.taskGraph.whenReady { taskGraph ->
+            configureJavaPlugin()
+
             if (project.plugins.hasPlugin('idea')) {
                 configureIdeaPlugin()
             }
@@ -54,7 +58,7 @@ class AndroidAnnotationsPlugin implements Plugin<Project> {
                 options.compilerArgs = [
                     '-processor', 'com.googlecode.androidannotations.AndroidAnnotationProcessor',
                     '-s', "${destinationDir.absolutePath}".toString(),
-                    '-processorpath', project.file('lib/androidannotations-2.2.jar').absolutePath
+                    '-processorpath', project.file("lib/androidannotations-${androidAnnotationsConvention.androidAnnotationsVersion}.jar").absolutePath
                 ]
                 Map antOptions = otherArgs + options.optionMap()
                 project.ant.javac(antOptions) {
@@ -78,7 +82,7 @@ class AndroidAnnotationsPlugin implements Plugin<Project> {
             annotationProcessing.@useClasspath = false
             annotationProcessing.appendNode(
                 'processorPath', [
-                    value: "\$PROJECT_DIR\$/lib/androidannotations-2.2.jar"
+                    value: "\$PROJECT_DIR\$/lib/androidannotations-${androidAnnotationsConvention.androidAnnotationsVersion}.jar"
                 ])
             annotationProcessing.appendNode(
                 'processor', [
