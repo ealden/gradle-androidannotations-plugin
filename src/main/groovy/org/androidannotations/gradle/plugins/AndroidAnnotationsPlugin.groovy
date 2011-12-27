@@ -22,9 +22,23 @@ import org.gradle.api.Project
 import org.gradle.api.file.FileCollection
 
 class AndroidAnnotationsPlugin implements Plugin<Project> {
+    private project
+
     void apply(Project project) {
+        this.project = project
+
         project.plugins.apply(AndroidPlugin.class)
 
+        configureJavaPlugin()
+
+        project.gradle.taskGraph.whenReady { taskGraph ->
+            if (project.plugins.hasPlugin('idea')) {
+                configureIdeaPlugin()
+            }
+        }
+    }
+
+    private void configureJavaPlugin() {
         project.compileJava {
             doFirst {
                 def destinationDir = project.tasks.jar.destinationDir
@@ -45,11 +59,37 @@ class AndroidAnnotationsPlugin implements Plugin<Project> {
                 Map antOptions = otherArgs + options.optionMap()
                 project.ant.javac(antOptions) {
                     source.addToAntBuilder(project.ant, 'src', FileCollection.AntType.MatchingTask)
-                    options.compilerArgs.each {value ->
+                    options.compilerArgs.each { value ->
                         compilerarg(value: value)
                     }
                 }
             }
+        }
+    }
+
+    private void configureIdeaPlugin() {
+        project.idea.project.ipr.withXml { provider ->
+            def compilerConfiguration = provider.node.component.find {
+                it.@name == 'CompilerConfiguration'
+            }
+
+            def annotationProcessing = compilerConfiguration.annotationProcessing[0]
+            annotationProcessing.@enabled = true
+            annotationProcessing.@useClasspath = false
+            annotationProcessing.appendNode(
+                'processorPath', [
+                    value: "\$PROJECT_DIR\$/lib/androidannotations-2.2.jar"
+                ])
+            annotationProcessing.appendNode(
+                'processor', [
+                    name: 'com.googlecode.androidannotations.AndroidAnnotationProcessor',
+                    options: ''
+                ])
+            annotationProcessing.appendNode(
+                'processModule', [
+                    name: 'HelloWorld',
+                    generatedDirName: 'gen'
+                ])
         }
     }
 }

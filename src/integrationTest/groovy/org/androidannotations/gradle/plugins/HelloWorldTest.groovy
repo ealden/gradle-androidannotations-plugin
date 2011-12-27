@@ -20,6 +20,9 @@ import org.androidannotations.gradle.plugins.support.AbstractIntegrationTest
 import org.junit.Before
 import org.junit.Test
 
+import static org.hamcrest.CoreMatchers.*
+import static org.junit.Assert.*
+
 class HelloWorldTest extends AbstractIntegrationTest {
     private project
 
@@ -33,5 +36,31 @@ class HelloWorldTest extends AbstractIntegrationTest {
         project.runTasks 'clean', 'assemble'
 
         project.fileExists 'build/libs/HelloWorld-1.0.jar'
+    }
+
+    @Test
+    void idea() {
+        project.runTasks 'cleanIdea', 'idea'
+
+        project.fileExists 'HelloWorld.ipr'
+        project.fileExists 'HelloWorld.iws'
+        project.fileExists 'HelloWorld.iml'
+
+        def ipr = new XmlSlurper().parse(project.file('HelloWorld.ipr'))
+
+        def compilerConfiguration = ipr.component.find {
+            it.@name == 'CompilerConfiguration'
+        }
+
+        def annotationProcessing = compilerConfiguration.annotationProcessing
+
+        assertThat(annotationProcessing.@enabled.text(), equalTo('true'))
+        assertThat(annotationProcessing.@useClasspath.text(), equalTo('false'))
+
+        assertThat(annotationProcessing.processorPath.@value.text(), equalTo('\$PROJECT_DIR\$/lib/androidannotations-2.2.jar'))
+        assertThat(annotationProcessing.processor.@name.text(), equalTo('com.googlecode.androidannotations.AndroidAnnotationProcessor'))
+        assertThat(annotationProcessing.processor.@options.text(), equalTo(''))
+        assertThat(annotationProcessing.processModule.@name.text(), equalTo('HelloWorld'))
+        assertThat(annotationProcessing.processModule.@generatedDirName.text(), equalTo('gen'))
     }
 }
