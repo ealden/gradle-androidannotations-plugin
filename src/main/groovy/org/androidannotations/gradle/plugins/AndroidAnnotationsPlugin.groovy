@@ -19,9 +19,37 @@ package org.androidannotations.gradle.plugins
 import com.jvoegele.gradle.plugins.android.AndroidPlugin
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.file.FileCollection
 
 class AndroidAnnotationsPlugin implements Plugin<Project> {
     void apply(Project project) {
         project.plugins.apply(AndroidPlugin.class)
+
+        project.compileJava {
+            doFirst {
+                def destinationDir = project.tasks.jar.destinationDir
+                project.mkdir destinationDir
+                Map otherArgs = [
+                    includeAntRuntime: false,
+                    destdir: destinationDir,
+                    classpath: project.configurations.compile.asPath,
+                    sourcepath: '',
+                    target: project.targetCompatibility,
+                    source: project.sourceCompatibility
+                ]
+                options.compilerArgs = [
+                    '-processor', 'com.googlecode.androidannotations.AndroidAnnotationProcessor',
+                    '-s', "${destinationDir.absolutePath}".toString(),
+                    '-processorpath', project.file('lib/androidannotations-2.2.jar').absolutePath
+                ]
+                Map antOptions = otherArgs + options.optionMap()
+                project.ant.javac(antOptions) {
+                    source.addToAntBuilder(project.ant, 'src', FileCollection.AntType.MatchingTask)
+                    options.compilerArgs.each {value ->
+                        compilerarg(value: value)
+                    }
+                }
+            }
+        }
     }
 }

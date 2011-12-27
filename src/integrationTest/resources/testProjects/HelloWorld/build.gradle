@@ -1,3 +1,11 @@
 version = '1.0'
 
 apply plugin: 'androidannotations'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile "com.googlecode.androidannotations:androidannotations:2.2:api"
+}
