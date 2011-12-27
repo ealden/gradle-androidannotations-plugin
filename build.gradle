@@ -1,0 +1,75 @@
+version = '0.1.0.BUILD-SNAPSHOT'
+group = 'org.androidannotations.gradle.plugins'
+description = 'Gradle AndroidAnnotations Plugin'
+abbreviation = 'ANDROIDANNOTATIONS'
+
+def artifact = 'gradle-androidannotations-plugin'
+project.artifact = artifact
+
+apply plugin: 'groovy'
+apply plugin: 'idea'
+
+def compatibilityVersion = 1.6
+sourceCompatibility = compatibilityVersion
+targetCompatibility = compatibilityVersion
+
+configurations {
+    integrationTestCompile {
+        extendsFrom testCompile
+    }
+    integrationTestRuntime {
+        extendsFrom integrationTestCompile, testRuntime
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+def gradleAndroidPluginVersion = '1.1.0'
+
+dependencies {
+    groovy localGroovy()
+    compile gradleApi()
+    compile "org.gradle.api.plugins:gradle-android-plugin:$gradleAndroidPluginVersion"
+}
+
+sourceSets {
+    integrationTest {
+        compileClasspath = sourceSets.main.output + configurations.testRuntime
+        runtimeClasspath = output + sourceSets.main.output + configurations.testRuntime
+        groovy {
+            srcDir file('src/integrationTest/groovy')
+        }
+        resources {
+            srcDir file('src/integrationTest/resources')
+        }
+    }
+}
+
+idea {
+    module {
+        downloadSources = true
+        downloadJavadoc = true
+
+        testSourceDirs += file('src/integrationTest/groovy')
+        testSourceDirs += file('src/integrationTest/resources')
+    }
+    project {
+        jdkName = '1.6'
+        languageLevel = compatibilityVersion
+    }
+}
+
+task integrationTest(type: Test, dependsOn: 'build') {
+    testClassesDir = sourceSets.integrationTest.output.classesDir
+    classpath = sourceSets.integrationTest.runtimeClasspath
+    systemProperties['integrationTest.testProjects'] = new File(sourceSets.integrationTest.output.resourcesDir, 'testProjects').absolutePath
+
+    outputs.upToDateWhen {
+        return false
+    }
+}
+
+defaultTasks 'assemble'
+

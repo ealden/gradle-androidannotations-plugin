@@ -1,0 +1,1 @@
+# AndroidAnnotations plugin for Gradle
