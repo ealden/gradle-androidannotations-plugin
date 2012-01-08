@@ -42,6 +42,9 @@ class AndroidAnnotationsPlugin implements Plugin<Project> {
 
         project.repositories {
             mavenCentral()
+            maven {
+                url 'https://oss.sonatype.org/content/repositories/snapshots/'
+            }
         }
 
         project.configurations {
