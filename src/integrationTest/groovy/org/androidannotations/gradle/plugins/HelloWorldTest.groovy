@@ -39,6 +39,13 @@ class HelloWorldTest extends AbstractIntegrationTest {
     }
 
     @Test
+    void noIdeaPlugin() {
+        project.runTasks 'clean', 'assemble', buildScript: 'no-idea.gradle'
+
+        project.fileExists 'build/libs/HelloWorld-1.0.jar'
+    }
+
+    @Test
     void idea() {
         project.runTasks 'cleanIdea', 'idea'
 
