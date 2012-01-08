@@ -28,29 +28,36 @@ class AndroidAnnotationsPlugin implements Plugin<Project> {
     void apply(Project project) {
         this.project = project
 
-        project.plugins.apply(AndroidPlugin.class)
+        configurePluginConvention()
+        configureBuildScript()
+    }
 
+    private void configurePluginConvention() {
         this.androidAnnotationsConvention = new AndroidAnnotationsConvention()
         project.convention.plugins.androidannotations = this.androidAnnotationsConvention
-
-        configureBuildScript()
-
-        project.gradle.taskGraph.whenReady { taskGraph ->
-            configureJavaPlugin()
-
-            if (project.plugins.hasPlugin('idea')) {
-                configureIdeaPlugin()
-            }
-        }
     }
 
     private void configureBuildScript() {
+        project.plugins.apply(AndroidPlugin.class)
+
         project.repositories {
             mavenCentral()
         }
 
         project.dependencies {
             compile "com.googlecode.androidannotations:androidannotations:${androidAnnotationsConvention.androidAnnotationsVersion}:api"
+        }
+
+        project.gradle.taskGraph.whenReady { taskGraph ->
+            configurePlugins()
+        }
+    }
+
+    private void configurePlugins() {
+        configureJavaPlugin()
+
+        if (project.plugins.hasPlugin('idea')) {
+            configureIdeaPlugin()
         }
     }
 
