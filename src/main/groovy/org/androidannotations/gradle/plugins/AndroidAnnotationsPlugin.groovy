@@ -49,13 +49,16 @@ class AndroidAnnotationsPlugin implements Plugin<Project> {
             androidannotations.extendsFrom(compile)
         }
 
+        project.gradle.taskGraph.whenReady { taskGraph ->
+            configureDependencies()
+            configurePlugins()
+        }
+    }
+
+    private void configureDependencies() {
         project.dependencies {
             compile "com.googlecode.androidannotations:androidannotations:${androidAnnotationsConvention.androidAnnotationsVersion}:api"
             androidannotations "com.googlecode.androidannotations:androidannotations:${androidAnnotationsConvention.androidAnnotationsVersion}"
-        }
-
-        project.gradle.taskGraph.whenReady { taskGraph ->
-            configurePlugins()
         }
     }
 
