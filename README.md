@@ -13,7 +13,7 @@ buildscript {
         }
     }
 
-    def gradleAndroidAnnotationsPluginVersion = '0.1.0'
+    def gradleAndroidAnnotationsPluginVersion = '0.2.0'
 
     dependencies {
         classpath "org.androidannotations.gradle.plugins:gradle-androidannotations-plugin:$gradleAndroidAnnotationsPluginVersion"
