@@ -26,5 +26,5 @@ apply plugin: 'idea'
 androidAnnotationsVersion = '2.2'
 ```
 
-[![Built on DEV@cloud](http://web-static-cloudfront.s3.amazonaws.com/images/badges/BuiltOnDEV.png)](https://gradle-android-plugin.ci.cloudbees.com)
+[![Built on DEV@cloud](http://web-static-cloudfront.s3.amazonaws.com/images/badges/BuiltOnDEV.png)](https://gradle-androidannotations-plugin.ci.cloudbees.com)
 
