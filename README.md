@@ -23,14 +23,6 @@ buildscript {
 apply plugin: 'androidannotations'
 apply plugin: 'idea'
 
-repositories {
-    mavenCentral()
-}
-
 androidAnnotationsVersion = '2.2'
-
-dependencies {
-    compile "com.googlecode.androidannotations:androidannotations:${androidAnnotationsVersion}"
-}
 ```
 
