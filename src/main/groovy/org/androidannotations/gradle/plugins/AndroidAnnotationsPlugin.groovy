@@ -44,8 +44,14 @@ class AndroidAnnotationsPlugin implements Plugin<Project> {
             mavenCentral()
         }
 
+        project.configurations {
+            androidannotations
+            androidannotations.extendsFrom(compile)
+        }
+
         project.dependencies {
             compile "com.googlecode.androidannotations:androidannotations:${androidAnnotationsConvention.androidAnnotationsVersion}:api"
+            androidannotations "com.googlecode.androidannotations:androidannotations:${androidAnnotationsConvention.androidAnnotationsVersion}"
         }
 
         project.gradle.taskGraph.whenReady { taskGraph ->
@@ -77,7 +83,7 @@ class AndroidAnnotationsPlugin implements Plugin<Project> {
                 options.compilerArgs = [
                     '-processor', 'com.googlecode.androidannotations.AndroidAnnotationProcessor',
                     '-s', "${destinationDir.absolutePath}".toString(),
-                    '-processorpath', project.file("lib/androidannotations-${androidAnnotationsConvention.androidAnnotationsVersion}.jar").absolutePath
+                    '-classpath', project.configurations.androidannotations.asPath
                 ]
                 Map antOptions = otherArgs + options.optionMap()
                 project.ant.javac(antOptions) {
@@ -91,6 +97,10 @@ class AndroidAnnotationsPlugin implements Plugin<Project> {
     }
 
     private void configureIdeaPlugin() {
+        project.idea.module {
+            scopes.PROVIDED.plus += project.configurations.androidannotations
+        }
+
         project.idea.project.ipr.withXml { provider ->
             def compilerConfiguration = provider.node.component.find {
                 it.@name == 'CompilerConfiguration'
@@ -98,11 +108,7 @@ class AndroidAnnotationsPlugin implements Plugin<Project> {
 
             def annotationProcessing = compilerConfiguration.annotationProcessing[0]
             annotationProcessing.@enabled = true
-            annotationProcessing.@useClasspath = false
-            annotationProcessing.appendNode(
-                'processorPath', [
-                    value: "\$PROJECT_DIR\$/lib/androidannotations-${androidAnnotationsConvention.androidAnnotationsVersion}.jar"
-                ])
+            annotationProcessing.@useClasspath = true
             annotationProcessing.appendNode(
                 'processor', [
                     name: 'com.googlecode.androidannotations.AndroidAnnotationProcessor',

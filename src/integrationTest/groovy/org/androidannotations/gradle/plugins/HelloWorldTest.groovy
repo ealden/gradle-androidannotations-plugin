@@ -55,9 +55,8 @@ class HelloWorldTest extends AbstractIntegrationTest {
         def annotationProcessing = compilerConfiguration.annotationProcessing
 
         assertThat(annotationProcessing.@enabled.text(), equalTo('true'))
-        assertThat(annotationProcessing.@useClasspath.text(), equalTo('false'))
+        assertThat(annotationProcessing.@useClasspath.text(), equalTo('true'))
 
-        assertThat(annotationProcessing.processorPath.@value.text(), equalTo('\$PROJECT_DIR\$/lib/androidannotations-2.2.jar'))
         assertThat(annotationProcessing.processor.@name.text(), equalTo('com.googlecode.androidannotations.AndroidAnnotationProcessor'))
         assertThat(annotationProcessing.processor.@options.text(), equalTo(''))
         assertThat(annotationProcessing.processModule.@name.text(), equalTo('HelloWorld'))
