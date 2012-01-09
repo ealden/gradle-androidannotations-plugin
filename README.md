@@ -8,9 +8,6 @@ This plugin configures a [Gradle](http://gradle.org) project to add [AndroidAnno
 buildscript {
     repositories {
         mavenCentral()
-        maven {
-            url 'http://maven.teamcodeflux.com/external'
-        }
     }
 
     def gradleAndroidAnnotationsPluginVersion = '0.3.0'
