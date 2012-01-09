@@ -1,5 +1,9 @@
 # Gradle AndroidAnnotations Plugin CHANGELOG
 
+## 2012-01-09: 0.3.0 RELEASE
+
+* Gradle AndroidAnnotations Plugin is now in Maven Central!
+
 ## 2012-01-08: 0.2.0 RELEASE
 
 * Simplied usage of AndroidAnnotations plugin:
