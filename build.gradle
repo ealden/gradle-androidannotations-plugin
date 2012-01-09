@@ -1,14 +1,18 @@
 version = '0.3.0.BUILD-SNAPSHOT'
-group = 'org.androidannotations.gradle.plugins'
+//group = 'org.androidannotations.gradle.plugins'
+group = 'net.ealden.gradle.plugins'
 description = 'Gradle AndroidAnnotations Plugin'
 abbreviation = 'ANDROIDANNOTATIONS'
 
 def artifact = 'gradle-androidannotations-plugin'
 project.artifact = artifact
 
+def isReleaseVersion = !version.endsWith('SNAPSHOT')
+
 apply plugin: 'groovy'
 apply plugin: 'idea'
 apply plugin: 'maven'
+apply plugin: 'signing'
 
 def compatibilityVersion = 1.6
 sourceCompatibility = compatibilityVersion
@@ -65,9 +69,35 @@ idea {
 uploadArchives {
     repositories {
         mavenDeployer {
-            repository url: 'file:///maven/external'
-            pom.artifactId = artifact
+            pom.project(pomConfiguration)
+
+            beforeDeployment { deployment ->
+                signPom(deployment)
+            }
+
+            def repositoryUsername = project.hasProperty('sonatypeUsername') ? sonatypeUsername : ''
+            def repositoryPassword = project.hasProperty('sonatypePassword') ? sonatypePassword : ''
+
+            if (isReleaseVersion) {
+                repository(url: 'https://oss.sonatype.org/service/local/staging/deploy/maven2') {
+                    authentication(userName: repositoryUsername, password: repositoryPassword)
+                }
+            } else {
+                repository(url: 'https://oss.sonatype.org/content/repositories/snapshots') {
+                    authentication(userName: repositoryUsername, password: repositoryPassword)
+                }
+            }
         }
+    }
+}
+
+jar {
+    baseName = artifact
+}
+
+signing {
+    if (isReleaseVersion) {
+        sign configurations.archives
     }
 }
 
@@ -78,6 +108,62 @@ task integrationTest(type: Test, dependsOn: 'build') {
 
     outputs.upToDateWhen {
         return false
+    }
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    baseName = artifact
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    baseName = artifact
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+task generatePom << {
+    def generatedPomFileName = 'pom.xml'
+
+    pom {
+        project(pomConfiguration)
+    }.writeTo("$buildDir/$generatedPomFileName")
+}
+
+artifacts {
+    archives sourcesJar
+    archives javadocJar
+}
+
+def getPomConfiguration() {
+    return {
+        groupId project.group
+        artifactId project.artifact
+        version project.version
+        packaging 'jar'
+        name 'Gradle AndroidAnnotations Plugin'
+        description 'AndroidAnnotations plugin for Gradle'
+        url 'https://github.com/ealden/gradle-androidannotations-plugin'
+        licenses {
+            license {
+                name 'The Apache Software License, Version 2.0'
+                url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                distribution 'repo'
+            }
+        }
+        scm {
+            url 'https://github.com/ealden/gradle-androidannotations-plugin'
+            connection 'scm:git://github.com/ealden/gradle-androidannotations-plugin.git'
+            developerConnection 'scm:git@github.com:ealden/gradle-androidannotations-plugin.git'
+        }
+        developers {
+            developer {
+                id 'ealden'
+                name 'Ealden Esto E. Escanan'
+                email 'ealden@gmail.com'
+            }
+        }
     }
 }
 
