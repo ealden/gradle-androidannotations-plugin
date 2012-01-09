@@ -1,4 +1,4 @@
-version = '0.3.0.BUILD-SNAPSHOT'
+version = '0.3.0'
 //group = 'org.androidannotations.gradle.plugins'
 group = 'net.ealden.gradle.plugins'
 description = 'Gradle AndroidAnnotations Plugin'
