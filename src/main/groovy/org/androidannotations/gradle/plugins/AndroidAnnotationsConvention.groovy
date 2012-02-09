@@ -1,5 +1,5 @@
 package org.androidannotations.gradle.plugins
 
 class AndroidAnnotationsConvention {
-    String androidAnnotationsVersion = '2.2'
+    String androidAnnotationsVersion = '2.4'
 }
