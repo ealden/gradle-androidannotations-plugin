@@ -131,6 +131,10 @@ task generatePom << {
     }.writeTo("$buildDir/$generatedPomFileName")
 }
 
+task wrapper(type: Wrapper) {
+    gradleVersion = '1.0-milestone-8a'
+}
+
 artifacts {
     archives sourcesJar
     archives javadocJar
