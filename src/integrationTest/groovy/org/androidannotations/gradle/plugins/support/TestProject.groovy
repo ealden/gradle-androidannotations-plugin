@@ -18,7 +18,7 @@ package org.androidannotations.gradle.plugins.support
 
 import org.gradle.GradleLauncher
 import org.gradle.api.Project
-import org.gradle.internal.nativeplatform.OperatingSystem
+import org.gradle.internal.os.OperatingSystem
 
 import static org.junit.Assert.*
 

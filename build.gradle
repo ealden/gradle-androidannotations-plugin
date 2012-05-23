@@ -2,10 +2,9 @@ version = '0.4.0.BUILD-SNAPSHOT'
 //group = 'org.androidannotations.gradle.plugins'
 group = 'net.ealden.gradle.plugins'
 description = 'Gradle AndroidAnnotations Plugin'
-abbreviation = 'ANDROIDANNOTATIONS'
 
 def artifact = 'gradle-androidannotations-plugin'
-project.artifact = artifact
+project.ext.set('artifact', artifact)
 
 def isReleaseVersion = !version.endsWith('SNAPSHOT')
 
@@ -135,7 +134,7 @@ task generatePom << {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '1.0-milestone-8a'
+    gradleVersion = '1.0-rc-3'
 }
 
 artifacts {
