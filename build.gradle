@@ -29,9 +29,12 @@ configurations {
 
 repositories {
     mavenCentral()
+    maven {
+        url 'https://oss.sonatype.org/content/repositories/snapshots/'
+    }
 }
 
-def gradleAndroidPluginVersion = '1.1.0'
+def gradleAndroidPluginVersion = '1.2.0-SNAPSHOT'
 
 dependencies {
     groovy localGroovy()
@@ -172,4 +175,3 @@ def getPomConfiguration() {
 }
 
 defaultTasks 'assemble'
-
