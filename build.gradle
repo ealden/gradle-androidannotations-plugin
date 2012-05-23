@@ -74,7 +74,7 @@ uploadArchives {
             pom.project(pomConfiguration)
 
             beforeDeployment { deployment ->
-                signPom(deployment)
+                signing.signPom(deployment)
             }
 
             def repositoryUsername = project.hasProperty('sonatypeUsername') ? sonatypeUsername : ''
