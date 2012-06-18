@@ -19,12 +19,12 @@ package org.androidannotations.gradle.plugins.support
 import org.gradle.testfixtures.ProjectBuilder
 
 abstract class AbstractIntegrationTest {
-    def testProjectsDir = new File(System.getProperty('integrationTest.testProjects'))
+  def testProjectsDir = new File(System.getProperty('integrationTest.testProjects'))
 
-    def project(path) {
-        def projectDir = new File(testProjectsDir, path)
-        def project = ProjectBuilder.builder().withProjectDir(projectDir).build()
+  def project(path) {
+    def projectDir = new File(testProjectsDir, path)
+    def project = ProjectBuilder.builder().withProjectDir(projectDir).build()
 
-        return new TestProject(project: project)
-    }
+    return new TestProject(project: project)
+  }
 }

@@ -18,159 +18,159 @@ sourceCompatibility = compatibilityVersion
 targetCompatibility = compatibilityVersion
 
 configurations {
-    integrationTestCompile {
-        extendsFrom testCompile
-    }
-    integrationTestRuntime {
-        extendsFrom integrationTestCompile, testRuntime
-    }
+  integrationTestCompile {
+    extendsFrom testCompile
+  }
+  integrationTestRuntime {
+    extendsFrom integrationTestCompile, testRuntime
+  }
 }
 
 repositories {
-    mavenCentral()
-    maven {
-        url 'https://oss.sonatype.org/content/repositories/snapshots/'
-    }
+  mavenCentral()
+  maven {
+    url 'https://oss.sonatype.org/content/repositories/snapshots/'
+  }
 }
 
 def gradleAndroidPluginVersion = '1.2.0-SNAPSHOT'
 
 dependencies {
-    groovy localGroovy()
-    compile gradleApi()
-    compile "org.gradle.api.plugins:gradle-android-plugin:$gradleAndroidPluginVersion"
+  groovy localGroovy()
+  compile gradleApi()
+  compile "org.gradle.api.plugins:gradle-android-plugin:$gradleAndroidPluginVersion"
 }
 
 sourceSets {
-    integrationTest {
-        compileClasspath = sourceSets.main.output + configurations.testRuntime
-        runtimeClasspath = output + sourceSets.main.output + configurations.testRuntime
-        groovy {
-            srcDir file('src/integrationTest/groovy')
-        }
-        resources {
-            srcDir file('src/integrationTest/resources')
-        }
+  integrationTest {
+    compileClasspath = sourceSets.main.output + configurations.testRuntime
+    runtimeClasspath = output + sourceSets.main.output + configurations.testRuntime
+    groovy {
+      srcDir file('src/integrationTest/groovy')
     }
+    resources {
+      srcDir file('src/integrationTest/resources')
+    }
+  }
 }
 
 idea {
-    module {
-        downloadSources = true
-        downloadJavadoc = true
+  module {
+    downloadSources = true
+    downloadJavadoc = true
 
-        testSourceDirs += file('src/integrationTest/groovy')
-        testSourceDirs += file('src/integrationTest/resources')
-    }
-    project {
-        jdkName = '1.6'
-        languageLevel = compatibilityVersion
-    }
+    testSourceDirs += file('src/integrationTest/groovy')
+    testSourceDirs += file('src/integrationTest/resources')
+  }
+  project {
+    jdkName = '1.6'
+    languageLevel = compatibilityVersion
+  }
 }
 
 uploadArchives {
-    repositories {
-        mavenDeployer {
-            pom.project(pomConfiguration)
+  repositories {
+    mavenDeployer {
+      pom.project(pomConfiguration)
 
-            beforeDeployment { deployment ->
-                signing.signPom(deployment)
-            }
+      beforeDeployment { deployment ->
+        signing.signPom(deployment)
+      }
 
-            def repositoryUsername = project.hasProperty('sonatypeUsername') ? sonatypeUsername : ''
-            def repositoryPassword = project.hasProperty('sonatypePassword') ? sonatypePassword : ''
+      def repositoryUsername = project.hasProperty('sonatypeUsername') ? sonatypeUsername : ''
+      def repositoryPassword = project.hasProperty('sonatypePassword') ? sonatypePassword : ''
 
-            if (isReleaseVersion) {
-                repository(url: 'https://oss.sonatype.org/service/local/staging/deploy/maven2') {
-                    authentication(userName: repositoryUsername, password: repositoryPassword)
-                }
-            } else {
-                repository(url: 'https://oss.sonatype.org/content/repositories/snapshots') {
-                    authentication(userName: repositoryUsername, password: repositoryPassword)
-                }
-            }
+      if (isReleaseVersion) {
+        repository(url: 'https://oss.sonatype.org/service/local/staging/deploy/maven2') {
+          authentication(userName: repositoryUsername, password: repositoryPassword)
         }
+      } else {
+        repository(url: 'https://oss.sonatype.org/content/repositories/snapshots') {
+          authentication(userName: repositoryUsername, password: repositoryPassword)
+        }
+      }
     }
+  }
 }
 
 jar {
-    baseName = artifact
+  baseName = artifact
 }
 
 signing {
-    if (isReleaseVersion) {
-        sign configurations.archives
-    }
+  if (isReleaseVersion) {
+    sign configurations.archives
+  }
 }
 
 task integrationTest(type: Test, dependsOn: 'build') {
-    testClassesDir = sourceSets.integrationTest.output.classesDir
-    classpath = sourceSets.integrationTest.runtimeClasspath
-    systemProperties['integrationTest.testProjects'] = new File(sourceSets.integrationTest.output.resourcesDir, 'testProjects').absolutePath
+  testClassesDir = sourceSets.integrationTest.output.classesDir
+  classpath = sourceSets.integrationTest.runtimeClasspath
+  systemProperties['integrationTest.testProjects'] = new File(sourceSets.integrationTest.output.resourcesDir, 'testProjects').absolutePath
 
-    outputs.upToDateWhen {
-        return false
-    }
+  outputs.upToDateWhen {
+    return false
+  }
 }
 
 task sourcesJar(type: Jar, dependsOn: classes) {
-    baseName = artifact
-    classifier = 'sources'
-    from sourceSets.main.allSource
+  baseName = artifact
+  classifier = 'sources'
+  from sourceSets.main.allSource
 }
 
 task javadocJar(type: Jar, dependsOn: javadoc) {
-    baseName = artifact
-    classifier = 'javadoc'
-    from javadoc.destinationDir
+  baseName = artifact
+  classifier = 'javadoc'
+  from javadoc.destinationDir
 }
 
 task generatePom << {
-    def generatedPomFileName = 'pom.xml'
+  def generatedPomFileName = 'pom.xml'
 
-    pom {
-        project(pomConfiguration)
-    }.writeTo("$buildDir/$generatedPomFileName")
+  pom {
+    project(pomConfiguration)
+  }.writeTo("$buildDir/$generatedPomFileName")
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '1.0'
+  gradleVersion = '1.0'
 }
 
 artifacts {
-    archives sourcesJar
-    archives javadocJar
+  archives sourcesJar
+  archives javadocJar
 }
 
 def getPomConfiguration() {
-    return {
-        groupId project.group
-        artifactId project.artifact
-        version project.version
-        packaging 'jar'
-        name 'Gradle AndroidAnnotations Plugin'
-        description 'AndroidAnnotations plugin for Gradle'
-        url 'https://github.com/ealden/gradle-androidannotations-plugin'
-        licenses {
-            license {
-                name 'The Apache Software License, Version 2.0'
-                url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                distribution 'repo'
-            }
-        }
-        scm {
-            url 'https://github.com/ealden/gradle-androidannotations-plugin'
-            connection 'scm:git://github.com/ealden/gradle-androidannotations-plugin.git'
-            developerConnection 'scm:git@github.com:ealden/gradle-androidannotations-plugin.git'
-        }
-        developers {
-            developer {
-                id 'ealden'
-                name 'Ealden Esto E. Escanan'
-                email 'ealden@gmail.com'
-            }
-        }
+  return {
+    groupId project.group
+    artifactId project.artifact
+    version project.version
+    packaging 'jar'
+    name 'Gradle AndroidAnnotations Plugin'
+    description 'AndroidAnnotations plugin for Gradle'
+    url 'https://github.com/ealden/gradle-androidannotations-plugin'
+    licenses {
+      license {
+        name 'The Apache Software License, Version 2.0'
+        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+        distribution 'repo'
+      }
     }
+    scm {
+      url 'https://github.com/ealden/gradle-androidannotations-plugin'
+      connection 'scm:git://github.com/ealden/gradle-androidannotations-plugin.git'
+      developerConnection 'scm:git@github.com:ealden/gradle-androidannotations-plugin.git'
+    }
+    developers {
+      developer {
+        id 'ealden'
+        name 'Ealden Esto E. Escanan'
+        email 'ealden@gmail.com'
+      }
+    }
+  }
 }
 
 defaultTasks 'assemble'

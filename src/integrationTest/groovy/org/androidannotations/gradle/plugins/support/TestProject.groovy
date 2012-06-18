@@ -23,55 +23,54 @@ import org.gradle.internal.os.OperatingSystem
 import static org.junit.Assert.*
 
 class TestProject {
-    Project project
+  Project project
 
-    def runTasks(String... tasks) {
-        runTasks([:], tasks as List<String>)
+  def runTasks(String... tasks) {
+    runTasks([:], tasks as List<String>)
+  }
+
+  def runTasks(Map<String, Object> args, String... tasks) {
+    runTasks(args, tasks as List<String>)
+  }
+
+  def runTasks(Map<String, Object> args, List<String> tasks) {
+    if (OperatingSystem.current().isWindows()) {
+      tasks.remove 'clean'
     }
 
-    def runTasks(Map<String, Object> args, String... tasks) {
-        runTasks(args, tasks as List<String>)
+    def startParameter = project.gradle.startParameter.newBuild()
+    startParameter.projectDir = project.projectDir
+
+    if (args.buildScript) {
+      startParameter.buildFile = new File(project.projectDir, args.buildScript)
     }
 
-    def runTasks(Map<String, Object> args, List<String> tasks) {
-        if (OperatingSystem.current().isWindows()) {
-            tasks.remove 'clean'
-        }
+    startParameter.taskNames = tasks
 
-        def startParameter = project.gradle.startParameter.newBuild()
-        startParameter.projectDir = project.projectDir
+    def launcher = GradleLauncher.newInstance(startParameter)
+    launcher.addListener(new IntegrationTestBuildListener())
 
-        if (args.buildScript) {
-            startParameter.buildFile = new File(project.projectDir, args.buildScript)
-        }
+    def result = launcher.run()
+    result.rethrowFailure()
+  }
 
-        startParameter.taskNames = tasks
+  def file(path) {
+    project.file(path)
+  }
 
-        def launcher = GradleLauncher.newInstance(startParameter)
-        launcher.addListener(new IntegrationTestBuildListener())
+  def exec(closure) {
+    project.exec(closure)
+  }
 
-        def result = launcher.run()
-        result.rethrowFailure()
+  def fileExists(path) {
+    assertTrue("File ${path} must exist", file(path).isFile())
+  }
+
+  def fileDoesntExist(path) {
+    if (OperatingSystem.current().isWindows()) {
+      return
     }
 
-    def file(path) {
-        project.file(path)
-    }
-
-    def exec(closure) {
-        project.exec(closure)
-    }
-
-    def fileExists(path) {
-        assertTrue("File ${path} must exist", file(path).isFile())
-    }
-
-    def fileDoesntExist(path) {
-        if (OperatingSystem.current().isWindows()) {
-            return
-        }
-
-        assertFalse("File ${path} must not exist", file(path).exists())
-    }
+    assertFalse("File ${path} must not exist", file(path).exists())
+  }
 }
-

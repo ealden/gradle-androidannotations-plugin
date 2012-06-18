@@ -24,49 +24,49 @@ import static org.hamcrest.CoreMatchers.*
 import static org.junit.Assert.*
 
 class HelloWorldTest extends AbstractIntegrationTest {
-    private project
+  private project
 
-    @Before
-    void setUp() {
-        this.project = project('HelloWorld')
+  @Before
+  void setUp() {
+    this.project = project('HelloWorld')
+  }
+
+  @Test
+  void assemble() {
+    project.runTasks 'clean', 'assemble'
+
+    project.fileExists 'build/libs/HelloWorld-1.0.jar'
+  }
+
+  @Test
+  void noIdeaPlugin() {
+    project.runTasks 'clean', 'assemble', buildScript: 'no-idea.gradle'
+
+    project.fileExists 'build/libs/HelloWorld-1.0.jar'
+  }
+
+  @Test
+  void idea() {
+    project.runTasks 'cleanIdea', 'idea'
+
+    project.fileExists 'HelloWorld.ipr'
+    project.fileExists 'HelloWorld.iws'
+    project.fileExists 'HelloWorld.iml'
+
+    def ipr = new XmlSlurper().parse(project.file('HelloWorld.ipr'))
+
+    def compilerConfiguration = ipr.component.find {
+      it.@name == 'CompilerConfiguration'
     }
 
-    @Test
-    void assemble() {
-        project.runTasks 'clean', 'assemble'
+    def annotationProcessing = compilerConfiguration.annotationProcessing
 
-        project.fileExists 'build/libs/HelloWorld-1.0.jar'
-    }
+    assertThat(annotationProcessing.@enabled.text(), equalTo('true'))
+    assertThat(annotationProcessing.@useClasspath.text(), equalTo('true'))
 
-    @Test
-    void noIdeaPlugin() {
-        project.runTasks 'clean', 'assemble', buildScript: 'no-idea.gradle'
-
-        project.fileExists 'build/libs/HelloWorld-1.0.jar'
-    }
-
-    @Test
-    void idea() {
-        project.runTasks 'cleanIdea', 'idea'
-
-        project.fileExists 'HelloWorld.ipr'
-        project.fileExists 'HelloWorld.iws'
-        project.fileExists 'HelloWorld.iml'
-
-        def ipr = new XmlSlurper().parse(project.file('HelloWorld.ipr'))
-
-        def compilerConfiguration = ipr.component.find {
-            it.@name == 'CompilerConfiguration'
-        }
-
-        def annotationProcessing = compilerConfiguration.annotationProcessing
-
-        assertThat(annotationProcessing.@enabled.text(), equalTo('true'))
-        assertThat(annotationProcessing.@useClasspath.text(), equalTo('true'))
-
-        assertThat(annotationProcessing.processor.@name.text(), equalTo('com.googlecode.androidannotations.AndroidAnnotationProcessor'))
-        assertThat(annotationProcessing.processor.@options.text(), equalTo(''))
-        assertThat(annotationProcessing.processModule.@name.text(), equalTo('HelloWorld'))
-        assertThat(annotationProcessing.processModule.@generatedDirName.text(), equalTo('gen'))
-    }
+    assertThat(annotationProcessing.processor.@name.text(), equalTo('com.googlecode.androidannotations.AndroidAnnotationProcessor'))
+    assertThat(annotationProcessing.processor.@options.text(), equalTo(''))
+    assertThat(annotationProcessing.processModule.@name.text(), equalTo('HelloWorld'))
+    assertThat(annotationProcessing.processModule.@generatedDirName.text(), equalTo('gen'))
+  }
 }
