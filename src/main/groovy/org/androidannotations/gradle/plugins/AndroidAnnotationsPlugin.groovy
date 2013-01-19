@@ -60,7 +60,7 @@ class AndroidAnnotationsPlugin implements Plugin<Project> {
 
   private void configureDependencies() {
     project.dependencies {
-      compile "com.googlecode.androidannotations:androidannotations:${androidAnnotationsConvention.androidAnnotationsVersion}:api"
+      compile "com.googlecode.androidannotations:androidannotations-api:${androidAnnotationsConvention.androidAnnotationsVersion}"
       androidannotations "com.googlecode.androidannotations:androidannotations:${androidAnnotationsConvention.androidAnnotationsVersion}"
     }
   }
