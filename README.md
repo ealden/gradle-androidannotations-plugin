@@ -10,7 +10,7 @@ buildscript {
         mavenCentral()
     }
 
-    def gradleAndroidAnnotationsPluginVersion = '0.3.0'
+    def gradleAndroidAnnotationsPluginVersion = '1.2.2-SNAPSHOT'
 
     dependencies {
         classpath "net.ealden.gradle.plugins:gradle-androidannotations-plugin:$gradleAndroidAnnotationsPluginVersion"
@@ -20,7 +20,7 @@ buildscript {
 apply plugin: 'androidannotations'
 apply plugin: 'idea'
 
-androidAnnotationsVersion = '2.2'
+androidAnnotationsVersion = '3.0-SNAPSHOT'
 ```
 
 [![Built on DEV@cloud](http://web-static-cloudfront.s3.amazonaws.com/images/badges/BuiltOnDEV.png)](https://gradle-androidannotations-plugin.ci.cloudbees.com)
