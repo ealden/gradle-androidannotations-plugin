@@ -41,10 +41,12 @@ class AndroidAnnotationsPlugin implements Plugin<Project> {
     project.plugins.apply(AndroidPlugin.class)
 
     project.repositories {
-      mavenCentral()
-      maven {
+      mavenLocal()
+	  mavenCentral()
+      
+	  /*maven {
         url 'https://oss.sonatype.org/content/repositories/snapshots/'
-      }
+      }*/
     }
 
     project.configurations {
@@ -60,8 +62,8 @@ class AndroidAnnotationsPlugin implements Plugin<Project> {
 
   private void configureDependencies() {
     project.dependencies {
-      compile "com.googlecode.androidannotations:androidannotations:${androidAnnotationsConvention.androidAnnotationsVersion}:api"
-      androidannotations "com.googlecode.androidannotations:androidannotations:${androidAnnotationsConvention.androidAnnotationsVersion}"
+      compile "${androidAnnotationsConvention.androidAnnotationsPackage}:androidannotations:${androidAnnotationsConvention.androidAnnotationsVersion}"
+      androidannotations "${androidAnnotationsConvention.androidAnnotationsPackage}:androidannotations-api:${androidAnnotationsConvention.androidAnnotationsVersion}"
     }
   }
 
@@ -87,7 +89,7 @@ class AndroidAnnotationsPlugin implements Plugin<Project> {
         source: project.sourceCompatibility
         ]
         options.compilerArgs = [
-          '-processor', 'com.googlecode.androidannotations.AndroidAnnotationProcessor',
+          '-processor', "${androidAnnotationsConvention.androidAnnotationsPackage}.AndroidAnnotationProcessor",
           '-s', "${destinationDir.absolutePath}".toString(),
           '-classpath', project.configurations.androidannotations.asPath
         ]
@@ -117,7 +119,7 @@ class AndroidAnnotationsPlugin implements Plugin<Project> {
       annotationProcessing.@useClasspath = true
       annotationProcessing.appendNode(
         'processor', [
-        name: 'com.googlecode.androidannotations.AndroidAnnotationProcessor',
+        name: "${androidAnnotationsConvention.androidAnnotationsPackage}.AndroidAnnotationProcessor",
         options: ''
         ])
       annotationProcessing.appendNode(
