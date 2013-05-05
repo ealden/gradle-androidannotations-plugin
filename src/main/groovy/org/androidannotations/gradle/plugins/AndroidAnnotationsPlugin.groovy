@@ -41,15 +41,15 @@ class AndroidAnnotationsPlugin implements Plugin<Project> {
     project.plugins.apply(AndroidPlugin.class)
 
     project.repositories {
-      mavenCentral()
-      maven {
-        url 'https://oss.sonatype.org/content/repositories/snapshots/'
-      }
-    }
+	  mavenCentral()
+      
+	  maven {
+	  	url 'https://oss.sonatype.org/content/repositories/snapshots/'
+	  }	
+	}
 
     project.configurations {
       androidannotations
-      androidannotations.extendsFrom(compile)
     }
 
     project.gradle.taskGraph.whenReady { taskGraph ->
@@ -60,8 +60,8 @@ class AndroidAnnotationsPlugin implements Plugin<Project> {
 
   private void configureDependencies() {
     project.dependencies {
-      compile "com.googlecode.androidannotations:androidannotations:${androidAnnotationsConvention.androidAnnotationsVersion}:api"
-      androidannotations "com.googlecode.androidannotations:androidannotations:${androidAnnotationsConvention.androidAnnotationsVersion}"
+      compile "${androidAnnotationsConvention.androidAnnotationsPackage}:androidannotations-api:${androidAnnotationsConvention.androidAnnotationsVersion}"
+      androidannotations "${androidAnnotationsConvention.androidAnnotationsPackage}:androidannotations:${androidAnnotationsConvention.androidAnnotationsVersion}"
     }
   }
 
@@ -87,9 +87,10 @@ class AndroidAnnotationsPlugin implements Plugin<Project> {
         source: project.sourceCompatibility
         ]
         options.compilerArgs = [
-          '-processor', 'com.googlecode.androidannotations.AndroidAnnotationProcessor',
+          '-processor', "${androidAnnotationsConvention.androidAnnotationsPackage}.AndroidAnnotationProcessor",
+          '-processorpath', project.configurations.androidannotations.asPath,
           '-s', "${destinationDir.absolutePath}".toString(),
-          '-classpath', project.configurations.androidannotations.asPath
+          '-classpath', project.configurations.compile.asPath
         ]
         Map antOptions = otherArgs + options.optionMap()
         project.ant.javac(antOptions) {
@@ -117,7 +118,7 @@ class AndroidAnnotationsPlugin implements Plugin<Project> {
       annotationProcessing.@useClasspath = true
       annotationProcessing.appendNode(
         'processor', [
-        name: 'com.googlecode.androidannotations.AndroidAnnotationProcessor',
+        name: "${androidAnnotationsConvention.androidAnnotationsPackage}.AndroidAnnotationProcessor",
         options: ''
         ])
       annotationProcessing.appendNode(
