@@ -44,14 +44,10 @@ class AndroidAnnotationsPlugin implements Plugin<Project> {
       mavenLocal()
 	  mavenCentral()
       
-	  /*maven {
-        url 'https://oss.sonatype.org/content/repositories/snapshots/'
-      }*/
-    }
+	}
 
     project.configurations {
       androidannotations
-      androidannotations.extendsFrom(compile)
     }
 
     project.gradle.taskGraph.whenReady { taskGraph ->
@@ -62,8 +58,8 @@ class AndroidAnnotationsPlugin implements Plugin<Project> {
 
   private void configureDependencies() {
     project.dependencies {
-      compile "${androidAnnotationsConvention.androidAnnotationsPackage}:androidannotations:${androidAnnotationsConvention.androidAnnotationsVersion}"
-      androidannotations "${androidAnnotationsConvention.androidAnnotationsPackage}:androidannotations-api:${androidAnnotationsConvention.androidAnnotationsVersion}"
+      compile "${androidAnnotationsConvention.androidAnnotationsPackage}:androidannotations-api:${androidAnnotationsConvention.androidAnnotationsVersion}"
+      androidannotations "${androidAnnotationsConvention.androidAnnotationsPackage}:androidannotations:${androidAnnotationsConvention.androidAnnotationsVersion}"
     }
   }
 
@@ -90,8 +86,9 @@ class AndroidAnnotationsPlugin implements Plugin<Project> {
         ]
         options.compilerArgs = [
           '-processor', "${androidAnnotationsConvention.androidAnnotationsPackage}.AndroidAnnotationProcessor",
+          '-processorpath', project.configurations.androidannotations.asPath,
           '-s', "${destinationDir.absolutePath}".toString(),
-          '-classpath', project.configurations.androidannotations.asPath
+          '-classpath', project.configurations.compile.asPath
         ]
         Map antOptions = otherArgs + options.optionMap()
         project.ant.javac(antOptions) {
